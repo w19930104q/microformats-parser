@@ -90,11 +90,20 @@ export const convertV1PropertyClassNames = (
   ),
 ];
 
+/**
+ * Split a reference attribute on HTML whitespace (tab, LF, FF, CR, space),
+ * dropping empty tokens, and keeping the order in which the IDs appear
+ */
+const HTML_WHITESPACE_REGEX = /[\t\n\f\r ]+/;
+
+const tokenizeReferences = (value: string): string[] =>
+  value.split(HTML_WHITESPACE_REGEX).filter(Boolean);
+
 export const getV1IncludeNames = (node: Element): string[] => {
   const itemref = getAttributeValue(node, "itemref");
 
   if (itemref) {
-    return itemref.split(" ");
+    return tokenizeReferences(itemref);
   }
 
   if (getClassNames(node).includes("include")) {
@@ -110,7 +119,7 @@ export const getV1IncludeNames = (node: Element): string[] => {
   const headers = node.tagName === "td" && getAttributeValue(node, "headers");
 
   if (headers) {
-    return [headers];
+    return tokenizeReferences(headers);
   }
 
   return [];
